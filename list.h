@@ -1,3 +1,6 @@
+#ifndef _LIST_H_
+#define _LIST_H_
+
 #include "util.h"
 
 struct list {
@@ -17,11 +20,10 @@ struct list {
 static inline void INIT_LIST_HEAD(struct list *l)
 {
     lhead(l) = ltail(l) = l;
-    return l;
 }
 
 static inline void __ladd(struct list *elt,
-	struct list *prev, struct list *next)
+	       	struct list *prev, struct list *next)
 {
     next->prev = elt;
     elt->next = next;
@@ -31,12 +33,12 @@ static inline void __ladd(struct list *elt,
 
 static inline void ladd(struct list *elt, struct list *l)
 {
-    __list_add(elt, l, lhead(l));
+    __ladd(elt, l, lhead(l));
 }
 
 static inline void ladd_tail(struct list *elt, struct list *l)
 {
-    __list_add(elt, ltail(l), l);
+    __ladd(elt, ltail(l), l);
 }
 
 #define lpush(elt, l) ladd((elt), (l))
@@ -50,7 +52,7 @@ static inline void __ldel(struct list *prev, struct list *next)
 
 static inline void ldel(struct list *entry)
 {
-    __list_del(entry->prev, entry->next);
+    __ldel(entry->prev, entry->next);
     entry->next = entry->prev = NULL;
 }
 
@@ -68,7 +70,7 @@ static inline struct list *dequeue(struct list *l)
     return elt;
 }
 
-static inline bool lempty(struct list *l)
+static inline int lempty(struct list *l)
 {
     return lhead(l) == l;
 }
@@ -89,13 +91,14 @@ static inline struct list *lsplice(struct list *l1, struct list *l2)
 #define lforeach_rev(pos, head) \
     for ((pos) = (head)->prev; (pos) != (head); (pos) = (pos)->prev)
 
-#define lforeach_entry(pos, head, member) \
-    for ((pos) = list_entry((head)->next, typeof(*pos), member); \
+#define lforeach_entry(pos, head, type, member) \
+    for ((pos) = lentry((head)->next, type, member); \
 	    &(pos)->member != (head); \
-	    (pos) = list_entry((pos)->member.next, typeof(*pos), member))
+	    (pos) = lentry((pos)->member.next, type, member))
 
-#define lforeach_entry_rev(pos, head, member) \
-    for ((pos) = list_entry((head)->prev, typeof(*pos), member); \
+#define lforeach_entry_rev(pos, head, type, member) \
+    for ((pos) = lentry((head)->prev, type, member); \
 	    &(pos)->member != (head); \
-	    (pos) = list_entry((pos)->member.prev, typeof(*pos), member))
+	    (pos) = lentry((pos)->member.prev, type, member))
 
+#endif  /* _LIST_H_ */
