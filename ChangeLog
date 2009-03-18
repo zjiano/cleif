@@ -1,0 +1,5 @@
+2009-03-18  Leif Walsh  <leif.walsh@gmail.com>
+
+	* util.h (container_of): Stole container_of from linux kernel.
+
+	* list.h: Created simple linked list.
