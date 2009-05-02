@@ -1,3 +1,5 @@
+#include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "../list.h"
@@ -18,10 +20,8 @@ int main(int argc, char *argv[])
 
     for (i = 0; i < 100; ++i) {
 	struct item *elt = (struct item *) malloc(sizeof(struct item));
+	assert(elt);
 	elt->val = i;
-	if (!elt) {
-	    abort("malloc failed");
-	}
 	ladd(&elt->head, &head);
     }
 
@@ -39,6 +39,8 @@ int main(int argc, char *argv[])
     if (i != 4950) {
 	fail("list should sum to 4950");
     }
+
+    printf("success!\n");
 
     return 0;
 }
