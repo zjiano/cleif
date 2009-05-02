@@ -1,5 +1,9 @@
 2009-05-02  Leif Walsh  <leif.walsh@gmail.com>
 
+	* README: Wrote a snarky README.
+
+	* TODO: Added some todo items.
+
 	* tree.h (struct tree): Created a tree data structure.  No
 	balancing yet.
 
