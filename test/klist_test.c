@@ -2,20 +2,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../list.h"
+#include "../klist.h"
 #include "../error.h"
 #include "test.h"
 
 struct item {
     int val;
-    struct list head;
+    struct klist head;
 };
 
 int main(int argc, char *argv[])
 {
     int i;
     LIST_HEAD(head);
-    struct list *p;
+    struct klist *p;
     struct item *e;
 
     for (i = 0; i < 100; ++i) {
@@ -30,14 +30,14 @@ int main(int argc, char *argv[])
 	i++;
     }
     if (i != 100) {
-	fail("there should be 100 items in the list");
+	fail("there should be 100 items in the klist");
     }
     i = 0;
     lforeach_entry(e, &head, struct item, head) {
 	i += e->val;
     }
     if (i != 4950) {
-	fail("list should sum to 4950");
+	fail("klist should sum to 4950");
     }
 
     printf("success!\n");

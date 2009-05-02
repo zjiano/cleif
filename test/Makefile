@@ -2,13 +2,21 @@ CC=gcc
 CFLAGS=-Wall -Werror
 LDFLAGS=-g3
 
-SRCS=tree.c
-HDRS=tree.h klist.h util.h error.h
+BINS=klist_test tree_test
+SRCS=klist_test.c tree_test.c
+HDRS=test.h
 OBJS=$(SRCS:.c=.o)
-DEPS=$(SRCS=.c=.d)
+DEPS=$(SRCS:.c=.d)
 TAGFILE=tags
 
-all: $(TAGFILE) $(OBJS)
+all: $(TAGFILE) $(BINS)
+
+klist_test: klist_test.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+tree_test: tree_test.c
+	make -C .. tree.o
+	$(CC) $(CFLAGS) -o $@ $< ../tree.o
 
 $(TAGFILE): $(SRCS) $(HDRS)
 	ctags -f $(TAGFILE) $(SRCS) $(HDRS)

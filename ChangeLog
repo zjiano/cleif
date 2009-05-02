@@ -1,5 +1,15 @@
 2009-05-02  Leif Walsh  <leif.walsh@gmail.com>
 
+	* klist.h: Moved to klist to allow for a non-kernel-style list
+	eventually.
+
+	* test/klist_test.c: Moved to klist to allow for a
+	non-kernel-style list eventually.
+
+	* test/Makefile: Created Makefile for tests.
+
+	* Makefile: Created Makefile.
+
 	* README: Wrote a snarky README.
 
 	* TODO: Added some todo items.

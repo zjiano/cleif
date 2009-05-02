@@ -3,13 +3,13 @@
 
 #include "util.h"
 
-struct list {
-    struct list *next, *prev;
+struct klist {
+    struct klist *next, *prev;
 };
 
 #define LIST_HEAD_INIT(name) { &(name), &(name) }
 
-#define LIST_HEAD(name) struct list name = LIST_HEAD_INIT(name)
+#define LIST_HEAD(name) struct klist name = LIST_HEAD_INIT(name)
 
 #define lhead(head) (head)->next
 #define ltail(head) (head)->prev
@@ -17,13 +17,13 @@ struct list {
 #define lentry(ptr, type, member) container_of(ptr, type, member)
 #define lentry_first(l, type, member) lentry(lhead(l), type, member)
 
-static inline void INIT_LIST_HEAD(struct list *l)
+static inline void INIT_LIST_HEAD(struct klist *l)
 {
     lhead(l) = ltail(l) = l;
 }
 
-static inline void __ladd(struct list *elt,
-	       	struct list *prev, struct list *next)
+static inline void __ladd(struct klist *elt,
+	       	struct klist *prev, struct klist *next)
 {
     next->prev = elt;
     elt->next = next;
@@ -31,12 +31,12 @@ static inline void __ladd(struct list *elt,
     prev->next = elt;
 }
 
-static inline void ladd(struct list *elt, struct list *l)
+static inline void ladd(struct klist *elt, struct klist *l)
 {
     __ladd(elt, l, lhead(l));
 }
 
-static inline void ladd_tail(struct list *elt, struct list *l)
+static inline void ladd_tail(struct klist *elt, struct klist *l)
 {
     __ladd(elt, ltail(l), l);
 }
@@ -44,38 +44,38 @@ static inline void ladd_tail(struct list *elt, struct list *l)
 #define lpush(elt, l) ladd((elt), (l))
 #define lenqueue(elt, l) ladd((elt), (l))
 
-static inline void __ldel(struct list *prev, struct list *next)
+static inline void __ldel(struct klist *prev, struct klist *next)
 {
     next->prev = prev;
     prev->next = next;
 }
 
-static inline void ldel(struct list *entry)
+static inline void ldel(struct klist *entry)
 {
     __ldel(entry->prev, entry->next);
     entry->next = entry->prev = NULL;
 }
 
-static inline struct list *pop(struct list *l)
+static inline struct klist *pop(struct klist *l)
 {
-    struct list *elt = lhead(l);
+    struct klist *elt = lhead(l);
     ldel(elt);
     return elt;
 }
 
-static inline struct list *dequeue(struct list *l)
+static inline struct klist *dequeue(struct klist *l)
 {
-    struct list *elt = ltail(l);
+    struct klist *elt = ltail(l);
     ldel(elt);
     return elt;
 }
 
-static inline int lempty(struct list *l)
+static inline int lempty(struct klist *l)
 {
     return lhead(l) == l;
 }
 
-static inline struct list *lsplice(struct list *l1, struct list *l2)
+static inline struct klist *lsplice(struct klist *l1, struct klist *l2)
 {
     ltail(l1)->next = lhead(l2);
     lhead(l2)->prev = ltail(l1);
