@@ -1,3 +1,8 @@
+2009-05-02  Leif Walsh  <leif.walsh@gmail.com>
+
+	* tree.h (struct tree): Created a tree data structure.  No
+	balancing yet.
+
 2009-03-18  Leif Walsh  <leif.walsh@gmail.com>
 
 	* util.h (container_of): Stole container_of from linux kernel.
