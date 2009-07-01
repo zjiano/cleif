@@ -11,7 +11,7 @@ struct item {
     struct klist head;
 };
 
-int main(int argc, char *argv[])
+int main(void)
 {
     int i;
     LIST_HEAD(head);
