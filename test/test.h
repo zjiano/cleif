@@ -11,4 +11,8 @@
 	exit(2); \
 } while(0)
 
+#define _assert(cond) do { \
+	if (!cond) { fail( #cond ); } \
+} while (0)
+
 #endif  /* _TEST_H_ */

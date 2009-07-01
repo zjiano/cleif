@@ -1,9 +1,9 @@
 CC=gcc
-CFLAGS=-Wall -Werror
+CFLAGS=-Wall -Werror -Wextra
 LDFLAGS=-g3
 
-BINS=klist_test tree_test
-SRCS=klist_test.c tree_test.c
+BINS=klist_test tree_test withstmt_test
+SRCS=klist_test.c tree_test.c withstmt_test.c
 HDRS=test.h
 OBJS=$(SRCS:.c=.o)
 DEPS=$(SRCS:.c=.d)
@@ -17,6 +17,9 @@ klist_test: klist_test.c
 tree_test: tree_test.c
 	make -C .. tree.o
 	$(CC) $(CFLAGS) -o $@ $< ../tree.o
+
+withstmt_test: withstmt_test.c
+	$(CC) $(CFLAGS) -o $@ $<
 
 $(TAGFILE): $(SRCS) $(HDRS)
 	ctags -f $(TAGFILE) $(SRCS) $(HDRS)
