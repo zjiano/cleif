@@ -1,27 +1,95 @@
 CC=gcc
-CFLAGS=-Wall -Werror -Wextra
-LDFLAGS=-g3
+CFLAGS+=-Wall -Werror -Wextra -g3
+LDFLAGS+=-g3
 
-SRCS=tree.c
-HDRS=tree.h klist.h util.h error.h
-OBJS=$(SRCS:.c=.o)
-DEPS=$(SRCS:.c=.d)
-TAGFILE=tags
+_klist_test_OBJS=klist_test.o
+_skiplist_test_OBJS=skiplist_test.o skiplist.o
+_tree_test_OBJS=tree_test.o tree.o
+_withstmt_test_OBJS=withstmt_test.o
 
-all: $(TAGFILE) $(OBJS)
+_OBJS=skiplist.o tree.o \
+	$(_klist_test_OBJS) \
+	$(_skiplist_test_OBJS) \
+	$(_tree_test_OBJS) \
+	$(_withstmt_test_OBJS)
+_DEPS=$(_OBJS:.o=.d)
 
-$(TAGFILE): $(SRCS) $(HDRS)
-	ctags -f $(TAGFILE) $(SRCS) $(HDRS)
+TESTS=klist_test skiplist_test tree_test withstmt_test
+klist_test_OBJS=$(addprefix .objs/,$(_klist_test_OBJS))
+skiplist_test_OBJS=$(addprefix .objs/,$(_skiplist_test_OBJS))
+tree_test_OBJS=$(addprefix .objs/,$(_tree_test_OBJS))
+withstmt_test_OBJS=$(addprefix .objs/,$(_withstmt_test_OBJS))
+OBJS=$(addprefix .objs/,$(_OBJS))
+DEPS=$(addprefix .deps/,$(_DEPS))
+
+cmd_cc_o_c=$(CC) $(CFLAGS) -o $@ -c $<
+quiet_cmd_cc_o_c = CC       $*.o
+cmd_md_d_c=$(CC) $(CFLAGS) -o $@ -MT .objs/$(patsubst %.c,%.o,$<) -M $<
+quiet_cmd_md_d_c = MD       $*.d
+cmd_ld_bin_o=$(CC) $(LDFLAGS) -o $@ $^
+quiet_cmd_ld_bin_o = LD       $@
+cmd_TAGS=etags $^
+quiet_cmd_TAGS = BUILD    TAGS
+cmd_tags=ctags $^
+quiet_cmd_tags = BUILD    tags
+cmd_cscope=cscope -b $^
+quiet_cmd_cscope = BUILD    cscope
+
+ifdef VERBOSE
+	quiet=
+	Q=
+else
+	quiet=quiet_
+	Q=@
+endif
+
+.PHONY: all tests check clean allclean
+all: tags TAGS cscope.out tests
+
+check: $(addprefix run_,$(TESTS))
+tests: $(TESTS)
+
+klist_test: $(klist_test_OBJS)
+	@echo "   $($(quiet)cmd_ld_bin_o)"; $(cmd_ld_bin_o)
+run_klist_test: klist_test
+	./$<
+
+skiplist_test: $(skiplist_test_OBJS)
+	@echo "   $($(quiet)cmd_ld_bin_o)"; $(cmd_ld_bin_o)
+run_skiplist_test: skiplist_test
+	./$<
+
+tree_test: $(tree_test_OBJS)
+	@echo "   $($(quiet)cmd_ld_bin_o)"; $(cmd_ld_bin_o)
+run_tree_test: tree_test
+	./$<
+
+withstmt_test: $(withstmt_test_OBJS)
+	@echo "   $($(quiet)cmd_ld_bin_o)"; $(cmd_ld_bin_o)
+run_withstmt_test: withstmt_test
+	./$<
+
+.objs/%.o: .deps/%.d
+.deps/%.d: %.c
+	$(Q)[[ -d .deps ]] || mkdir -p .deps
+	@echo "   $($(quiet)cmd_md_d_c)"; $(cmd_md_d_c)
+
+.objs/%.o: %.c
+	$(Q)[[ -d .objs ]] || mkdir -p .objs
+	@echo "   $($(quiet)cmd_cc_o_c)"; $(cmd_cc_o_c)
 
 clean:
-	rm -f $(BINS) $(OBJS) $(DEPS)
+	$(Q)rm -f $(OBJS) $(TESTS)
 
 allclean: clean
-	rm -f .*.sw? "#"*"#" *\~ $(TAGFILE)
+	$(Q)rm -f .*.sw? "#"*"#" *\~ tags TAGS cscope.out $(DEPS)
 
-%.o: %.d
-
-%.d: %.c
-	$(CC) -M $(CFLAGS) -o $@ $<
+TAGS tags cscope: $(wildcard *.c) $(wildcard *.h)
+TAGS:
+	@echo "   $($(quiet)cmd_TAGS)"; $(cmd_TAGS)
+tags:
+	@echo "   $($(quiet)cmd_tags)"; $(cmd_tags)
+cscope.out:
+	@echo "   $($(quiet)cmd_cscope)"; $(cmd_cscope)
 
 -include $(DEPS)

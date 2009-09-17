@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../klist.h"
-#include "../error.h"
+#include "klist.h"
+#include "error.h"
 #include "test.h"
 
 struct item {

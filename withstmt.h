@@ -4,7 +4,7 @@
 #define with(lock, lock_fn, unlock_fn, block)   \
     do {                                        \
     lock_fn(&lock);                             \
-    (block)                                     \
+    (block);                                    \
     unlock_fn(&lock);                           \
     } while(0)
 

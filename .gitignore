@@ -1,2 +1,5 @@
-*.d
+.objs/*
+.deps/*
 tags
+TAGS
+cscope.out

@@ -2,11 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../tree.h"
-#include "../error.h"
+#include "tree.h"
+#include "error.h"
 #include "test.h"
 
-int cmp(const void *p1, const void *p2, void *data)
+int cmp(const void *p1, const void *p2, __attribute__((unused)) void *data)
 {
 	if (*((int *)p1) < *((int *)p2)) {
 		return -1;
@@ -23,7 +23,7 @@ void act(const void *val, void *counters)
 	((int *)counters)[1] += *((int *)val);
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
 	int i, counters[2];
 	struct tree *t;
