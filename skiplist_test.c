@@ -15,7 +15,7 @@ void test_create(void) {
     sl_init(sl, int_cmp, NULL);
     slp = NULL;
     slp = sl_new(int_cmp, NULL);
-    expect(slp);
+    assert(slp);
 
     sl_delete(sl);
     sl_delete(slp);
@@ -27,10 +27,31 @@ void test_insert(void) {
     const int nelts = 1000;
 
     sl = sl_new(int_cmp, NULL);
-    assert(sl);
+    expect(sl);
 
     v = (int *) malloc(nelts * sizeof(int));
-    assert(v);
+    expect(v);
+    for (i = 0; i < nelts; ++i) {
+        v[i] = i;
+        tmp_sl = NULL;
+        tmp_sl = sl_insert(sl, &v[i]);
+        assert(tmp_sl);
+    }
+
+    sl_delete(sl);
+    free(v);
+}
+
+void test_find(void) {
+    SkipList sl, tmp_sl;
+    int i, *v, *found;
+    const int nelts = 1000;
+
+    sl = sl_new(int_cmp, NULL);
+    expect(sl);
+
+    v = (int *) malloc(nelts * sizeof(int));
+    expect(v);
     for (i = 0; i < nelts; ++i) {
         v[i] = i;
         tmp_sl = NULL;
@@ -38,11 +59,15 @@ void test_insert(void) {
         expect(tmp_sl);
     }
 
+    for (i = 0; i < nelts; ++i) {
+        found = (int *) sl_find(sl, &i);
+        assert(found);
+        assert(found == &v[i]);
+        assert(*found == i);
+    }
+
     sl_delete(sl);
-}
-
-void test_find(void) {
-
+    free(v);
 }
 
 int main(void) {
