@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-#include "error.h"
-#include "test.h"
-#include "withstmt.h"
+#include <error.h>
+#include <test.h>
+#include <withstmt.h>
 
 struct null_lock {
     int id, num_locks, num_unlocks;

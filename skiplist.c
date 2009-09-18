@@ -45,13 +45,19 @@ static struct skiplist *sl_insert_aux(struct skiplist *sl, void *val,
     if (c_next <= 0) {
         if (sl->dup) {
             ret = sl_insert_aux(sl->dup, val, cmp, data, c);
-            if (ret != NULL && rand() > (RAND_MAX / 2)) {
-                struct skiplist *new_ = sl_new_head();
-                new_->val_ = val;
-                new_->next = sl->next;
-                new_->dup = ret;
-                sl->next = new_;
-                return new_;
+            if (ret) {
+                ret->next = sl->next;
+                sl->next = ret;
+
+                if (rand() > (RAND_MAX / 2)) {
+                    struct skiplist *new_ = sl_new_head();
+                    new_->val_ = val;
+                    new_->dup = ret;
+
+                    return new_;
+                } else {
+                    return NULL;
+                }
             } else {
                 return NULL;
             }
@@ -60,7 +66,14 @@ static struct skiplist *sl_insert_aux(struct skiplist *sl, void *val,
             ret->val_ = val;
             ret->next = sl->next;
             sl->next = ret;
-            return ret;
+            if (rand() > (RAND_MAX / 2)) {
+                struct skiplist *new_ = sl_new_head();
+                new_->val_ = val;
+                new_->dup = ret;
+                return new_;
+            } else {
+                return NULL;
+            }
         }
     } else {
         return sl_insert_aux(sl->next, val, cmp, data, c_next);
@@ -68,16 +81,25 @@ static struct skiplist *sl_insert_aux(struct skiplist *sl, void *val,
 }
 
 SkipList sl_insert(SkipList sl, void *val) {
+    struct skiplist *res;
+
     if (sl->bottom == NULL) {
         sl->top = sl->bottom = sl_new_head();
     }
-    sl_insert_aux(sl->top, val, sl->cmp_, sl->data_, 1);
+    res = sl_insert_aux(sl->top, val, sl->cmp_, sl->data_, 1);
+    if (res) {
+        struct skiplist *tmp = sl->top;
+        sl->top = sl_new_head();
+        sl->top->next = res;
+        res->next = sl->top;
+        sl->top->dup = tmp;
+    }
 
     return sl;
 }
 
-void *sl_find_aux(struct skiplist *sl, void *val, sl_cmp_fn cmp, void *data,
-                  int c) {
+static void *sl_find_aux(struct skiplist *sl, void *val, sl_cmp_fn cmp,
+                         void *data, int c) {
     int c_next;
 
     assert(c > 0);
@@ -109,8 +131,8 @@ void *sl_find(SkipList sl, void *val) {
     }
 }
 
-void *sl_remove_aux(struct skiplist *sl, void *val, sl_cmp_fn cmp, void *data,
-                    int c) {
+static void *sl_remove_aux(struct skiplist *sl, void *val, sl_cmp_fn cmp,
+                           void *data, int c) {
     int c_next;
     struct skiplist *old;
     void *ret;
@@ -155,7 +177,7 @@ void *sl_remove(SkipList sl, void *val) {
     }
 }
 
-void sl_delete_aux(struct skiplist *sl, sl_free_fn free_fn) {
+static void sl_delete_aux(struct skiplist *sl, sl_free_fn free_fn) {
     if (free_fn && !SL_IS_HEAD(sl)) {
         free_fn(sl->val_);
     }
@@ -178,4 +200,15 @@ void sl_delete(SkipList sl, sl_free_fn free_fn) {
     sl_delete_aux(cur, free_fn);
 
     free(sl);
+}
+
+static void sl_walk_aux(struct skiplist *sl, sl_visit_fn visit, void *arg) {
+    if (!SL_IS_HEAD(sl)) {
+        visit(sl->val_, arg);
+        sl_walk_aux(sl->next, visit, arg);
+    }
+}
+
+void sl_walk(SkipList sl, sl_visit_fn visit, void *arg) {
+    sl_walk_aux(sl->bottom->next, visit, arg);
 }

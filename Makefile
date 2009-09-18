@@ -1,24 +1,28 @@
 CC=gcc
-CFLAGS+=-Wall -Werror -Wextra -g3
-LDFLAGS+=-g3
+CFLAGS+=-Wall -Werror -Wextra -g3 -I.
+LDFLAGS+=-g3 -lrt
 
 _klist_test_OBJS=klist_test.o
 _skiplist_test_OBJS=skiplist_test.o skiplist.o
 _tree_test_OBJS=tree_test.o tree.o
 _withstmt_test_OBJS=withstmt_test.o
+_skiplist_perf_OBJS=skiplist_perf.o skiplist.o
 
 _OBJS=skiplist.o tree.o \
 	$(_klist_test_OBJS) \
 	$(_skiplist_test_OBJS) \
 	$(_tree_test_OBJS) \
-	$(_withstmt_test_OBJS)
+	$(_withstmt_test_OBJS) \
+	$(_skiplist_perf_OBJS)
 _DEPS=$(_OBJS:.o=.d)
 
-TESTS=klist_test skiplist_test tree_test withstmt_test
+TEST_BINS=klist_test skiplist_test tree_test withstmt_test
 klist_test_OBJS=$(addprefix .objs/,$(_klist_test_OBJS))
 skiplist_test_OBJS=$(addprefix .objs/,$(_skiplist_test_OBJS))
 tree_test_OBJS=$(addprefix .objs/,$(_tree_test_OBJS))
 withstmt_test_OBJS=$(addprefix .objs/,$(_withstmt_test_OBJS))
+PERF_BINS=skiplist_perf
+skiplist_perf_OBJS=$(addprefix .objs/,$(_skiplist_perf_OBJS))
 OBJS=$(addprefix .objs/,$(_OBJS))
 DEPS=$(addprefix .deps/,$(_DEPS))
 
@@ -43,11 +47,12 @@ else
 	Q=@
 endif
 
-.PHONY: all tests check clean allclean
-all: tags TAGS cscope.out tests
+.PHONY: all tests perfs check clean allclean
+all: tags TAGS cscope.out tests perfs
 
-check: $(addprefix run_,$(TESTS))
-tests: $(TESTS)
+check: $(addprefix run_,$(TEST_BINS))
+tests: $(TEST_BINS)
+perfs: $(PERF_BINS)
 
 klist_test: $(klist_test_OBJS)
 	@echo "   $($(quiet)cmd_ld_bin_o)"; $(cmd_ld_bin_o)
@@ -69,6 +74,11 @@ withstmt_test: $(withstmt_test_OBJS)
 run_withstmt_test: withstmt_test
 	./$<
 
+skiplist_perf: $(skiplist_perf_OBJS)
+	@echo "   $($(quiet)cmd_ld_bin_o)"; $(cmd_ld_bin_o)
+run_skiplist_perf: skiplist_perf
+	./$<
+
 .objs/%.o: .deps/%.d
 .deps/%.d: %.c
 	$(Q)[[ -d .deps ]] || mkdir -p .deps
@@ -79,7 +89,7 @@ run_withstmt_test: withstmt_test
 	@echo "   $($(quiet)cmd_cc_o_c)"; $(cmd_cc_o_c)
 
 clean:
-	$(Q)rm -f $(OBJS) $(TESTS)
+	$(Q)rm -f $(OBJS) $(TEST_BINS) $(PERF_BINS)
 
 allclean: clean
 	$(Q)rm -f .*.sw? "#"*"#" *\~ tags TAGS cscope.out $(DEPS)

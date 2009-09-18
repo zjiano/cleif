@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "tree.h"
-#include "error.h"
-#include "test.h"
+#include <tree.h>
+#include <error.h>
+#include <test.h>
 
 int cmp(const void *p1, const void *p2, __attribute__((unused)) void *data)
 {

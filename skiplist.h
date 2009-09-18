@@ -8,6 +8,7 @@ struct skiplist {
 
 typedef int (*sl_cmp_fn)(const void *, const void *, const void *);
 typedef void (*sl_free_fn)(void *);
+typedef int (*sl_visit_fn)(const void *, void *);
 
 struct sl_meta {
     struct skiplist *top, *bottom;
@@ -22,5 +23,6 @@ SkipList sl_insert(SkipList, void *);
 void *sl_find(SkipList, void *);
 void *sl_remove(SkipList, void *);
 void sl_delete(SkipList, sl_free_fn);
+void sl_walk(SkipList, sl_visit_fn, void *);
 
 #endif  /* __SKIPLIST_H__ */
