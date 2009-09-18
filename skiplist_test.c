@@ -17,7 +17,7 @@ int int_cmp(const void *p1, const void *p2,
     return (*((int *) p1) > *((int *) p2)) - (*((int *) p1) < *((int *) p2));
 }
 
-void test_create(void) {
+static void test_create(void) {
     SkipList sl;
 
     sl = NULL;
@@ -27,7 +27,7 @@ void test_create(void) {
     sl_delete(sl, NULL);
 }
 
-void test_insert(void) {
+static void test_insert(void) {
     SkipList sl, tmp_sl;
     int i, *v;
     const int nelts = 1000;
@@ -51,7 +51,7 @@ void test_insert(void) {
     free(v);
 }
 
-void test_find(void) {
+static void test_find(void) {
     SkipList sl, tmp_sl;
     int i, *v, *w, *found;
     const int nelts = 1000;
@@ -93,7 +93,7 @@ void test_find(void) {
     free(v);
 }
 
-void test_remove(void) {
+static void test_remove(void) {
     SkipList sl, tmp_sl;
     int i, j, *v, *w, *found;
     const int nelts = 100;
@@ -162,7 +162,7 @@ void visitor(const void *val, void *arg) {
     a[i] = 1;
 }
 
-void test_visit(void) {
+static void test_visit(void) {
     SkipList sl, tmp_sl;
     int i, *v;
     struct visitor_arg v_arg;
