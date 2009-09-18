@@ -1,7 +1,7 @@
 #ifndef _LIST_H_
 #define _LIST_H_
 
-#include "util.h"
+#include <util.h>
 
 struct klist {
     struct klist *next, *prev;
@@ -81,7 +81,7 @@ static inline struct klist *lsplice(struct klist *l1, struct klist *l2)
     lhead(l2)->prev = ltail(l1);
     ltail(l2)->next = l1;
     l1->prev = ltail(l2);
-    l2->next = l2->prev = NULL; 
+    l2->next = l2->prev = NULL;
     return l1;
 }
 

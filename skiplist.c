@@ -170,10 +170,19 @@ static void *sl_remove_aux(struct skiplist *sl, void *val, sl_cmp_fn cmp,
 }
 
 void *sl_remove(SkipList sl, void *val) {
+    void *ret;
+
     if (sl->bottom == NULL) {
         return NULL;
     } else {
-        return sl_remove_aux(sl->top, val, sl->cmp_, sl->data_, 1);
+        struct skiplist *old;
+        ret = sl_remove_aux(sl->top, val, sl->cmp_, sl->data_, 1);
+        while (sl->top->next == sl->top && sl->top->dup) {
+            old = sl->top;
+            sl->top = sl->top->dup;
+            free(old);
+        }
+        return ret;
     }
 }
 

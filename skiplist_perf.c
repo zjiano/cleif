@@ -96,6 +96,7 @@ int main(void) {
             (toc.tv_nsec - tic.tv_nsec) / 1000000000.0;
         printf("%8d %12.08f\n", nelts, time_spent);
 
+        free(w);
         free(v);
         sl_delete(sl, NULL);
     }
@@ -141,8 +142,40 @@ int main(void) {
             (toc.tv_nsec - tic.tv_nsec) / 1000000000.0;
         printf("%8d %12.08f\n", nelts, time_spent);
 
+        free(w);
         free(v);
         sl_delete(sl, NULL);
+    }
+
+    printf("Deleting:\n");
+    for (nelts = lo; nelts <= hi; nelts *= factor) {
+        sl = sl_new(int_cmp, NULL);
+        assert(sl);
+
+        v = (int *) malloc(nelts * sizeof(*v));
+        assert(v);
+
+        for (i = 0; i < nelts; ++i) {
+            v[i] = i;
+        }
+
+        shuffle(v, nelts);
+
+        for (i = 0; i < nelts; ++i) {
+            sl = sl_insert(sl, &v[i]);
+        }
+
+        free(v);
+
+        res = clock_gettime(CLOCK_REALTIME, &tic);
+        assert(!res);
+        sl_delete(sl, NULL);
+        res = clock_gettime(CLOCK_REALTIME, &toc);
+        assert(!res);
+
+        time_spent = toc.tv_sec - tic.tv_sec +
+            (toc.tv_nsec - tic.tv_nsec) / 1000000000.0;
+        printf("%8d %12.08f\n", nelts, time_spent);
     }
 
     return 0;
