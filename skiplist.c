@@ -109,6 +109,73 @@ void *sl_find(SkipList sl, void *val) {
     }
 }
 
-void sl_delete(__attribute__((unused)) SkipList sl) {
-    
+void *sl_remove_aux(struct skiplist *sl, void *val, sl_cmp_fn cmp, void *data,
+                    int c) {
+    int c_next;
+    struct skiplist *old;
+    void *ret;
+
+    assert(c > 0);
+
+    if (SL_IS_HEAD(sl->next)) {
+        c_next = -1;
+    } else {
+        c_next = cmp(val, sl->next->val_, data);
+    }
+
+    if (c_next > 0) {
+        return sl_remove_aux(sl->next, val, cmp, data, c_next);
+    } else if (c_next < 0) {
+        if (sl->dup != NULL) {
+            return sl_remove_aux(sl->dup, val, cmp, data, c);
+        } else {
+            return NULL;
+        }
+    } else {
+        if (sl->dup != NULL) {
+            old = sl->next;
+            sl->next = sl->next->next;
+            free(old);
+            return sl_remove_aux(sl->dup, val, cmp, data, c);
+        } else {
+            old = sl->next;
+            ret = old->val_;
+            sl->next = sl->next->next;
+            free(old);
+            return ret;
+        }
+    }
+}
+
+void *sl_remove(SkipList sl, void *val) {
+    if (sl->bottom == NULL) {
+        return NULL;
+    } else {
+        return sl_remove_aux(sl->top, val, sl->cmp_, sl->data_, 1);
+    }
+}
+
+void sl_delete_aux(struct skiplist *sl, sl_free_fn free_fn) {
+    if (free_fn && !SL_IS_HEAD(sl)) {
+        free_fn(sl->val_);
+    }
+
+    if (sl->next && !SL_IS_HEAD(sl->next)) {
+        sl_delete_aux(sl->next, free_fn);
+    }
+
+    free(sl);
+}
+
+void sl_delete(SkipList sl, sl_free_fn free_fn) {
+    struct skiplist *dup, *cur = sl->top;
+
+    while (cur != sl->bottom) {
+        dup = cur->dup;
+        sl_delete_aux(cur, NULL);
+        cur = dup;
+    }
+    sl_delete_aux(cur, free_fn);
+
+    free(sl);
 }
