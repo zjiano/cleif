@@ -45,35 +45,22 @@ static struct skiplist *sl_insert_aux(struct skiplist *sl, void *val,
     if (c_next <= 0) {
         if (sl->dup) {
             ret = sl_insert_aux(sl->dup, val, cmp, data, c);
-            if (ret) {
-                ret->next = sl->next;
-                sl->next = ret;
-
-                if (rand() > (RAND_MAX / 2)) {
-                    struct skiplist *new_ = sl_new_head();
-                    new_->val_ = val;
-                    new_->dup = ret;
-
-                    return new_;
-                } else {
-                    return NULL;
-                }
-            } else {
+            if (!ret) {
                 return NULL;
             }
         } else {
             ret = sl_new_head();
             ret->val_ = val;
-            ret->next = sl->next;
-            sl->next = ret;
-            if (rand() > (RAND_MAX / 2)) {
-                struct skiplist *new_ = sl_new_head();
-                new_->val_ = val;
-                new_->dup = ret;
-                return new_;
-            } else {
-                return NULL;
-            }
+        }
+        ret->next = sl->next;
+        sl->next = ret;
+        if (rand() > (RAND_MAX / 2)) {
+            struct skiplist *new_ = sl_new_head();
+            new_->val_ = val;
+            new_->dup = ret;
+            return new_;
+        } else {
+            return NULL;
         }
     } else {
         return sl_insert_aux(sl->next, val, cmp, data, c_next);
